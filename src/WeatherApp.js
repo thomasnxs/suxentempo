@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons'; // Importe os ícones da biblioteca de ícones que você está usando
 
 const WeatherApp = () => {
   const [city, setCity] = useState('');
@@ -10,10 +11,11 @@ const WeatherApp = () => {
   const fetchWeatherData = async () => {
     try {
       const response = await fetch(
-        `http://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${city}`
+        `http://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${city}&lang=pt`
       );
       const data = await response.json();
       setWeatherData(data);
+      setCity('');
     } catch (error) {
       console.error('Error fetching weather data:', error);
     }
@@ -21,20 +23,30 @@ const WeatherApp = () => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <Ionicons name="cloud-outline" size={24} color="white" />
+        <Text style={styles.appName}>SuxenTempo</Text>
+        <Ionicons name="cloud-outline" size={24} color="white" />
+      </View>
       <TextInput
         style={styles.input}
-        placeholder="Coloque o nome da cidade!"
+        placeholder="Digite o nome da cidade!"
         value={city}
         onChangeText={setCity}
       />
-      <Button style={styles.button} title="Pesquisar" onPress={fetchWeatherData} />
+      <TouchableOpacity style={styles.button} onPress={fetchWeatherData}>
+        <Text style={styles.buttonText}>Pesquisar</Text>
+      </TouchableOpacity>
       {weatherData && (
         <View style={styles.weatherContainer}>
-          <Text style={styles.weatherText}>
-            Temperatura: {weatherData.current.temp_c}°C
+          <Text style={styles.cityText}>
+            {weatherData.location.name}, {weatherData.location.country}
           </Text>
           <Text style={styles.weatherText}>
-            Condição: {weatherData.current.condition.text}
+            {weatherData.current.temp_c}°C
+          </Text>
+          <Text style={styles.alertText}>
+             {weatherData.current.condition.text}
           </Text>
         </View>
       )}
@@ -48,31 +60,59 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor:'#2F4F4F'
+    backgroundColor: '#ff0066'
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  appName: {
+    fontSize: 50,
+    fontWeight: 'bold',
+    marginHorizontal: 10,
+    color:'white'
   },
   input: {
     height: 40,
     width: '80%',
-    borderColor: 'black',
+    borderColor: 'white',
     borderWidth: 3,
     marginBottom: 10,
     paddingHorizontal: 10,
-    borderRadius:25,
-    backgroundColor: '#D3D3D3'
+    borderRadius:20,
+    backgroundColor:'#d3d3d3'
+  },
+  button: {
+    backgroundColor: 'blue',
+    padding: 10,
+    borderRadius: 20,
+    width: '80%',
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
   },
   weatherContainer: {
     marginTop: 20,
     alignItems: 'center',
   },
   weatherText: {
+    fontSize: 100,
+    marginBottom: 10,
+    color:"white",
+  },
+  alertText:{
+    fontSize: 20,
+    marginBottom: 10,
+    color:"white",
+  },
+  cityText:{
     fontSize: 30,
     marginBottom: 10,
-  },
-  button:{
-    color:'white',
-    backgroundColor:''
-    
-
+    color:"white",
   }
 });
 
