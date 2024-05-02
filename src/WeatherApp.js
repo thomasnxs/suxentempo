@@ -1,12 +1,34 @@
 import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // Importe os ícones da biblioteca de ícones que você está usando
+import { Keyboard } from 'react-native';
+import { MaterialIcons, Fontisto, Feather, Ionicons } from '@expo/vector-icons';
 
 const WeatherApp = () => {
   const [city, setCity] = useState('');
   const [weatherData, setWeatherData] = useState(null);
 
   const API_KEY = '320c88236c3645e096024237240205';
+
+
+  const getWeatherIcon = (code) => {
+    switch (code) {
+      case 1000:
+        return <MaterialIcons name="wb-sunny" size={50} color="white" />;
+      case 1003:
+        return <Fontisto name="day-cloudy" size={50} color="white" />;
+      case 1006:
+        return <Fontisto name="cloudy" size={50} color="white" />;
+      case 1063:
+      case 1180:
+      case 1183:
+        return <Feather name="cloud-rain" size={50} color="white" />;
+      case 1087:
+      case 1273:
+        return <Ionicons name="thunderstorm" size={50} color="white" />;
+      default:
+        return null; // Caso padrão
+    }
+  };
 
   const fetchWeatherData = async () => {
     try {
@@ -16,10 +38,12 @@ const WeatherApp = () => {
       const data = await response.json();
       setWeatherData(data);
       setCity('');
+      Keyboard.dismiss();
     } catch (error) {
       console.error('Error fetching weather data:', error);
     }
   };
+  
 
   return (
     <View style={styles.container}>
@@ -45,8 +69,11 @@ const WeatherApp = () => {
           <Text style={styles.weatherText}>
             {weatherData.current.temp_c}°C
           </Text>
+          <View style={styles.weatherIcon}>
+            {getWeatherIcon(weatherData.current.condition.code)}
+          </View>
           <Text style={styles.alertText}>
-             {weatherData.current.condition.text}
+            {weatherData.current.condition.text}
           </Text>
         </View>
       )}
@@ -103,6 +130,7 @@ const styles = StyleSheet.create({
     fontSize: 100,
     marginBottom: 10,
     color:"white",
+    fontWeight: 'bold',
   },
   alertText:{
     fontSize: 20,
@@ -113,7 +141,11 @@ const styles = StyleSheet.create({
     fontSize: 30,
     marginBottom: 10,
     color:"white",
+  },
+  weatherIcon: {
+    marginBottom: 10,
   }
+  
 });
 
 export default WeatherApp;
